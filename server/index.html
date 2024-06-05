@@ -78,8 +78,9 @@
     const sendfile = (metadata, buffer) => {
       socket.emit("file-meta", { metadata: metadata });
       socket.on("file-share", () => {
-        let chunk = buffer.slice(0, metadata.buffer_size);
-        buffer = buffer.slice(metadata.buffer_size, buffer.length);
+        let chunk = buffer.slice(0, 2048);
+        buffer = buffer.slice(2048, buffer.length);
+        console.log(chunk);
         console.log(metadata.total_buffer_size - buffer.length);
         if (chunk.length != 0) {
           socket.emit("file-raw", {
