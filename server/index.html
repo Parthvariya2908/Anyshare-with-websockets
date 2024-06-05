@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <title>Socket.IO chat</title>
+    <style>
+      body,
+      html {
+        height: 100%;
+        width: 100%;
+        display: flex;
+        align-items: center;
+        flex-direction: column;
+        font-family: Arial, Helvetica, sans-serif;
+      }
+      input {
+        opacity: 0;
+        cursor: pointer;
+      }
+      .container {
+        margin-top: 5%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        height: 30%;
+        width: 80%;
+        border: 2px dashed #ccc;
+        border-radius: 4rem;
+        cursor: pointer;
+      }
+      span {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+      }
+      .heading {
+        cursor: pointer;
+        font-size: x-large;
+        color: #666;
+      }
+      #filecontainer {
+        margin-top: 2%;
+        width: 70%;
+        height: auto;
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        align-items: center;
+        word-wrap: break-word;
+        border: 2px dashed #ccc;
+        border-radius: 1rem;
+        display: none;
+      }
+      #selectedfile {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+    </style>
+  </head>
+  <body>
+    <div
+      class="container"
+      onclick="document.getElementById('fileInput').click()"
+    >
+      <span class="heading">CLICK HERE TO SELECT</span>
+      <input type="file" id="fileInput" />
+    </div>
+    <div id="filecontainer">
+      <div id="selectedfile"></div>
+    </div>
+  </body>
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    const socket = io();
+    const sendfile = (metadata, buffer) => {
+      socket.emit("file-meta", { metadata: metadata });
+      socket.on("file-share", () => {
+        let chunk = buffer.slice(0, metadata.buffer_size);
+        buffer = buffer.slice(metadata.buffer_size, buffer.length);
+        console.log(metadata.total_buffer_size - buffer.length);
+        if (chunk.length != 0) {
+          socket.emit("file-raw", {
+            buffer: chunk,
+            totallength: buffer.length,
+          });
+        }
+      });
+    };
+    document.querySelector("#fileInput").addEventListener("change", (e) => {
+      let file = e.target.files[0];
+      if (!file) {
+        return;
+      }
+      var mydiv = document.getElementById("selectedfile");
+      var outer = document.getElementById("filecontainer");
+      mydiv.textContent = `${file.name}`;
+      outer.style.display = "block";
+      let reader = new FileReader();
+      reader.onload = () => {
+        let buffer = new Uint8Array(reader.result);
+        console.log(buffer);
+        sendfile(
+          {
+            filename: file.name,
+            total_buffer_size: buffer.length,
+            buffer_size: 1024,
+          },
+          buffer
+        );
+      };
+      reader.readAsArrayBuffer(file);
+    });
+  </script>
+</html>
