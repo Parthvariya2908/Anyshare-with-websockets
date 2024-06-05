@@ -26,7 +26,7 @@
         height: 30%;
         width: 80%;
         border: 2px dashed #ccc;
-        border-radius: 4rem;
+        border-radius: 2rem;
         cursor: pointer;
       }
       span {
@@ -40,20 +40,23 @@
         font-size: x-large;
         color: #666;
       }
-      #filecontainer {
-        margin-top: 2%;
-        width: 70%;
-        height: auto;
+      .filecontainer {
+        margin-top: 5%;
         display: flex;
-        flex-direction: row;
-        justify-content: center;
+        flex-direction: column;
         align-items: center;
-        word-wrap: break-word;
+        height: auto;
+        width: 80%;
         border: 2px dashed #ccc;
         border-radius: 1rem;
-        display: none;
+        cursor: pointer;
       }
-      #selectedfile {
+      .selectedfile {
+        width: 80%;
+        margin: 8px;
+        padding: 5px 5px 5px 5px;
+        border: 2px dashed #ccc;
+        border-radius: 3rem;
         display: flex;
         justify-content: center;
         align-items: center;
@@ -68,8 +71,8 @@
       <span class="heading">CLICK HERE TO SELECT</span>
       <input type="file" id="fileInput" />
     </div>
-    <div id="filecontainer">
-      <div id="selectedfile"></div>
+    <div class="filecontainer">
+      <div class="selectedfile">Your privious send files !</div>
     </div>
   </body>
   <script src="/socket.io/socket.io.js"></script>
@@ -95,10 +98,11 @@
       if (!file) {
         return;
       }
-      var mydiv = document.getElementById("selectedfile");
-      var outer = document.getElementById("filecontainer");
+      var outer = document.querySelector(".filecontainer");
+      var mydiv = document.createElement("div");
+      mydiv.classList.add("selectedfile");
       mydiv.textContent = `${file.name}`;
-      outer.style.display = "block";
+      outer.appendChild(mydiv);
       let reader = new FileReader();
       reader.onload = () => {
         let buffer = new Uint8Array(reader.result);

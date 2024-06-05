@@ -49,7 +49,7 @@
       var container = document.querySelector(".container");
       var mydiv = document.createElement("div");
       mydiv.classList.add("recievedfile");
-      mydiv.style = mydiv.textContent = `${metadata.filename}`;
+      mydiv.textContent = `${metadata.filename}`;
       container.appendChild(mydiv);
       fileshare.metadata = metadata;
       fileshare.transmitted = 0;
